@@ -1,4 +1,4 @@
-# COBRA+ • Sistema de Gerenciamento de Cobrança
+# COBRA- • Sistema de Gerenciamento de Cobrança
 
 Sistema profissional para gestão de dívidas, cálculo automático de juros e disparos de notificações via WhatsApp.
 

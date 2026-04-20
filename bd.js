@@ -212,6 +212,15 @@ function gerarQRCode(elementId, texto) {
   }
 }
 
+// NOVAS FUNÇÕES PARA PERFIL PERSISTENTE
+async function saveUserProfile(user, photo) {
+    return await writeToFirebase(`profiles/${user}`, { photo });
+}
+
+async function getUserProfile(user) {
+    return await readFromFirebase(`profiles/${user}`);
+}
+
 const DB = {
   initFirebase,
   getAll,
@@ -228,7 +237,9 @@ const DB = {
   deleteSaida,
   getInventory,
   gerarQRCode,
-  clearCollection
+  clearCollection,
+  saveUserProfile,
+  getUserProfile
 };
 
 window.DB = DB;

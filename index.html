@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema Profissional de Gerenciamento de Agiotagem e Cobrança - Responsivo">
+    <title>COBRA+ • Gerenciamento de Dívidas e Cobrança</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #dc2626;
+        }
+        
+        * {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .tailwind-ready .bg-primary { background-color: #dc2626; }
+        
+        .sidebar-link {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-link:hover {
+            background-color: #f3e8e8;
+            color: #dc2626;
+            transform: translateX(4px);
+        }
+        
+        .active-link {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgb(220 38 38 / 0.1), 0 8px 10px -6px rgb(220 38 38 / 0.1);
+        }
+        
+        .modal {
+            animation: modalPop 0.3s ease forwards;
+        }
+        
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .data-table tr {
+            transition: all 0.2s ease;
+        }
+        
+        .data-table tr:hover {
+            background-color: #fef2f2;
+        }
+        
+        .status-em-dia { background-color: #ecfdf5; color: #10b981; }
+        .status-vencido { background-color: #fef2f2; color: #dc2626; }
+        .status-pago { background-color: #f0f9ff; color: #0ea5e9; }
+
+        #profile-photo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+        .client-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #f1f1f1;
+        }
+        /* New Loader Style */
+        .file-upload-progress {
+            height: 4px;
+            width: 0%;
+            background: #dc2626;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body class="tailwind-ready">
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen" class="min-h-screen bg-gradient-to-br from-red-800 to-red-950 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-red-600 px-8 py-10 text-white text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
+                        <i class="fa-solid fa-hand-holding-dollar text-4xl"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold tracking-tighter">COBRA+</h1>
+                <p class="text-red-100 mt-2 text-lg">Gerenciamento Profissional de Cobrança</p>
+                <p class="text-xs text-red-200 mt-6">Sistema 100% responsivo • Funciona em celular, tablet e computador</p>
+            </div>
+            
+            <!-- Form -->
+            <div class="px-8 py-10">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900">Acesse o Painel</h2>
+                    <p class="text-gray-500 text-sm mt-1">Insira suas credenciais cadastradas</p>
+                </div>
+                
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="username" placeholder="Seu usuário" 
+                                   class="w-full pl-11 pr-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-red-600 text-lg">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="password" id="password" placeholder="********" 
+                                   class="w-full pl-11 pr-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-red-600 text-lg">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 text-red-600 accent-red-600">
+                            <span class="text-gray-600">Manter conectado</span>
+                        </label>
+                        <a href="#" id="recover-password-link" class="text-red-600 hover:text-red-700 font-medium">Esqueci a senha</a>
+                    </div>
+                    
+                    <button type="submit"
+                            class="w-full bg-red-600 hover:bg-red-700 transition-all text-white font-semibold py-4 rounded-2xl text-lg shadow-lg shadow-red-500/30 flex items-center justify-center gap-2">
+                        <span>ENTRAR NO PAINEL</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+                
+                <div class="mt-8 text-center text-xs text-gray-400 flex items-center gap-2 justify-center">
+                    <div class="h-px bg-gray-200 flex-1"></div>
+                    ACESSO RESTRITO
+                    <div class="h-px bg-gray-200 flex-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PAINEL PRINCIPAL -->
+    <div id="main-app" class="hidden min-h-screen bg-gray-50">
+        <!-- TOPBAR -->
+        <div class="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="lg:hidden w-10 h-10 bg-red-600 text-white rounded-2xl flex items-center justify-center text-xl cursor-pointer" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </div>
+                    <div class="hidden lg:flex items-center gap-3">
+                        <div class="w-9 h-9 bg-red-600 text-white rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 tracking-tighter">COBRA+</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <div class="relative cursor-pointer" onclick="showNotificationsModal()">
+                        <i class="fa-solid fa-bell text-2xl text-gray-700"></i>
+                        <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <p id="display-user-name" class="font-semibold text-gray-900">Administrador</p>
+                            <p class="text-xs text-gray-500">Online</p>
+                        </div>
+                        <div onclick="showProfileModal()" class="w-9 h-9 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-xl cursor-pointer overflow-hidden border-2 border-transparent hover:border-red-600 transition-all">
+                            <span id="profile-photo-placeholder">👑</span>
+                            <img id="profile-photo-img" src="" alt="" class="hidden">
+                        </div>
+                    </div>
+                    
+                    <button onclick="logout()" class="flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded-2xl text-sm font-medium transition-colors">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Sair</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="max-w-screen-2xl mx-auto flex">
+            <!-- SIDEBAR -->
+            <div class="hidden lg:flex w-72 bg-white border-r border-gray-100 min-h-[calc(100vh-73px)] flex-col">
+                <nav id="sidebar-nav" class="flex-1 px-4 py-6 space-y-1 text-sm"></nav>
+                <div class="p-6 border-t text-xs text-gray-400">
+                    Última verificação automática:<br>
+                    <span id="last-auto-check" class="font-mono text-red-600">Nunca</span>
+                </div>
+            </div>
+            
+            <!-- CONTEÚDO -->
+            <div class="flex-1 p-6 lg:p-10">
+                <div id="screen-dashboard" class="screen">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <h2 class="text-4xl font-semibold text-gray-900">Painel Geral</h2>
+                            <p class="text-gray-500">Acompanhamento de ativos e dívidas</p>
+                        </div>
+                        <button onclick="runAutomaticMessages()" class="bg-red-600 text-white px-6 py-3 rounded-2xl font-semibold flex items-center gap-2 hover:bg-red-700 shadow-lg shadow-red-200">
+                            <i class="fa-solid fa-robot"></i> DISPARAR ALERTAS
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="card-hover bg-white rounded-3xl p-6 border border-gray-100">
+                            <p class="text-gray-400 text-sm">Capital em Aberto</p>
+                            <p id="total-debt" class="text-3xl font-bold text-gray-900 mt-1">R$ 0</p>
+                        </div>
+                        <div class="card-hover bg-white rounded-3xl p-6 border border-gray-100">
+                            <p class="text-gray-400 text-sm">Devedores Ativos</p>
+                            <p id="total-debtors" class="text-3xl font-bold text-gray-900 mt-1">0</p>
+                        </div>
+                        <div class="card-hover bg-white rounded-3xl p-6 border border-gray-100">
+                            <p class="text-gray-400 text-sm">Vencidos Hoje</p>
+                            <p id="overdue-count" class="text-3xl font-bold text-red-600 mt-1">0</p>
+                        </div>
+                        <div class="card-hover bg-white rounded-3xl p-6 border border-gray-100">
+                            <p class="text-gray-400 text-sm">Cobranças Realizadas</p>
+                            <p id="messages-today" class="text-3xl font-bold text-blue-600 mt-1">0</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-lg mb-6 flex items-center gap-2 text-red-600"><i class="fa-solid fa-triangle-exclamation"></i> VENCIDO:</h3>
+                            <div id="vencidos-list" class="space-y-4"></div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-6 flex items-center gap-2 text-blue-600"><i class="fa-solid fa-calendar-days"></i> PRÓXIMOS VENCIMENTOS:</h3>
+                            <div id="next-due-list" class="space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="screen-debtors" class="screen hidden">
+                    <div class="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                        <h2 class="text-3xl font-semibold">Carteira de Clientes</h2>
+                        <div class="flex items-center gap-4 flex-1 justify-end min-w-[300px]">
+                            <div class="relative flex-1 max-w-md">
+                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="search-debtors" placeholder="Buscar por nome ou telefone..." 
+                                       class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all">
+                            </div>
+                            <button onclick="showAddDebtorModal()" class="bg-red-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-red-200 whitespace-nowrap">
+                                <i class="fa-solid fa-plus"></i> CADASTRAR DÉBITO
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-bold">
+                                    <tr>
+                                        <th class="px-8 py-4">Cliente</th>
+                                        <th class="px-6 py-4">Valor Atualizado</th>
+                                        <th class="px-6 py-4">Data Limite</th>
+                                        <th class="px-6 py-4">Anexos</th>
+                                        <th class="px-6 py-4">Situação</th>
+                                        <th class="px-8 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="debtors-table-body" class="divide-y divide-gray-100 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="screen-messages" class="screen hidden">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-3xl font-semibold">Log de Notificações</h2>
+                        <button onclick="confirmClearMessages()" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-red-100 hover:text-red-600 transition-all">
+                            <i class="fa-solid fa-trash-can"></i> LIMPAR HISTÓRICO
+                        </button>
+                    </div>
+                    <div id="messages-list" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DEVEDOR -->
+    <div id="debtor-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[99999] p-4 overflow-y-auto">
+        <div class="modal bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl my-8">
+            <h3 id="modal-title" class="text-2xl font-bold mb-6">Configurar Dívida</h3>
+            <form id="debtor-form" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">NOME DO CLIENTE</label>
+                        <input id="modal-name" type="text" required class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">WHATSAPP/CELULAR</label>
+                        <input id="modal-phone" type="tel" placeholder="5511999999999" required class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">VALOR ORIGINAL (R$)</label>
+                        <input id="modal-amount" type="number" step="0.01" required class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">DATA ACORDADA</label>
+                        <input id="modal-due-date" type="date" required class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">JUROS DIÁRIOS (%)</label>
+                    <input id="modal-interest" type="number" step="0.1" value="3.0" class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl">
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-3xl space-y-4">
+                    <p class="text-xs font-bold text-red-800 uppercase flex items-center gap-2"><i class="fa-solid fa-paperclip"></i> Anexos e Identidade</p>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-400 mb-1 uppercase">Foto Perfil Cliente</label>
+                        <input id="modal-photo-file" type="file" accept="image/*" class="w-full px-5 py-2 bg-white border-none rounded-xl text-sm">
+                        <input type="hidden" id="modal-photo">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-red-400 mb-1 uppercase">Doc Identidade (RG/CPF)</label>
+                            <input id="modal-doc-file" type="file" accept="image/*,application/pdf" class="w-full px-5 py-2 bg-white border-none rounded-xl text-sm">
+                            <input type="hidden" id="modal-doc">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-red-400 mb-1 uppercase">Comprovante de Banco</label>
+                            <input id="modal-bank-file" type="file" accept="image/*,application/pdf" class="w-full px-5 py-2 bg-white border-none rounded-xl text-sm">
+                            <input type="hidden" id="modal-bank">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-6">
+                    <button type="button" onclick="hideDebtorModal()" class="flex-1 py-4 bg-gray-100 rounded-2xl font-bold text-gray-500">CANCELAR</button>
+                    <button type="submit" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold">SALVAR REGISTRO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL GENÉRICO DE CONFIRMAÇÃO -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100000] p-4">
+        <div class="modal bg-white rounded-3xl max-sm w-full p-8 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 id="confirm-title" class="text-xl font-bold mb-2">Você tem certeza?</h3>
+            <p id="confirm-msg" class="text-gray-500 text-sm mb-8">Esta ação não poderá ser desfeita após confirmada.</p>
+            <div class="flex gap-3">
+                <button id="confirm-cancel" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">NÃO</button>
+                <button id="confirm-yes" class="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">SIM, CONTINUAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RECUPERAÇÃO DE SENHA -->
+    <div id="recover-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[99999] p-4">
+        <div class="modal bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl">
+            <h3 class="text-2xl font-bold mb-2 text-center">Recuperar Acesso</h3>
+            <p class="text-gray-500 text-center text-sm mb-6">Informe o usuário para receber as instruções.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Nome de Usuário</label>
+                    <input id="recover-username" type="text" placeholder="Digite seu usuário" class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-500">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="hideRecoverModal()" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">VOLTAR</button>
+                    <button onclick="processRecovery()" class="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">ENVIAR SENHA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOTIFICAÇÕES -->
+    <div id="notifications-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[99999] p-4">
+        <div class="modal bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Notificações Recentes</h3>
+                <button onclick="hideNotificationsModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="notifications-modal-list" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
+            <div class="pt-6">
+                <button onclick="navigate('messages'); hideNotificationsModal();" class="w-full py-4 bg-red-600 text-white rounded-2xl font-bold">VER TUDO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PERFIL -->
+    <div id="profile-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[99999] p-4">
+        <div class="modal bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl">
+            <h3 class="text-2xl font-bold mb-6 text-center">Configurações de Perfil</h3>
+            <div class="space-y-6">
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 bg-red-100 text-red-600 rounded-3xl flex items-center justify-center text-4xl mb-4 overflow-hidden border-2 border-red-200">
+                        <span id="profile-preview-placeholder">👑</span>
+                        <img id="profile-preview-img" src="" class="hidden">
+                    </div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">UPLOAD DE FOTO</label>
+                    <input id="profile-photo-file" type="file" accept="image/*" class="w-full px-5 py-2 bg-gray-50 border-none rounded-xl text-sm mb-4">
+                    <div class="file-upload-progress mb-2" id="profile-progress"></div>
+                </div>
+                
+                <div class="h-px bg-gray-100"></div>
+                
+                <div>
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <span class="font-semibold text-gray-700">Cobrança Automática (5 min)</span>
+                        <div class="relative inline-block w-12 h-6 transition duration-200 ease-in-out bg-gray-200 rounded-full">
+                            <input type="checkbox" id="toggle-reminders" class="absolute w-6 h-6 bg-white border-4 border-gray-200 rounded-full appearance-none cursor-pointer checked:right-0 checked:bg-red-600 checked:border-red-600 right-6 transition-all duration-200">
+                        </div>
+                    </label>
+                    <p class="text-[10px] text-gray-400 mt-1 uppercase font-bold italic">Realiza o disparo automático a cada 5 minutos para atrasados</p>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button onclick="hideProfileModal()" class="flex-1 py-4 bg-gray-100 rounded-2xl font-bold text-gray-500 uppercase text-sm">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './bd.js';
+        import { credenciais } from './rec_senha.js';
+
+        window.debtors = [];
+        window.messagesLog = [];
+        let reminderInterval = null;
+
+        async function loadData() {
+            window.debtors = await DB.getAll('debtors');
+            window.messagesLog = await DB.getAll('messagesLog');
+            renderDebtorsTable();
+            renderNextDue();
+            renderMessages();
+            updateDashboardCards();
+            updateUIPrivate();
+        }
+
+        function updateUIPrivate() {
+            const photo = localStorage.getItem('profile_photo');
+            const userName = localStorage.getItem('cobrama_user');
+            
+            if(userName) {
+                document.getElementById('display-user-name').textContent = userName;
+            }
+
+            if(photo) {
+                document.getElementById('profile-photo-img').src = photo;
+                document.getElementById('profile-photo-img').classList.remove('hidden');
+                document.getElementById('profile-photo-placeholder').classList.add('hidden');
+                document.getElementById('profile-preview-img').src = photo;
+                document.getElementById('profile-preview-img').classList.remove('hidden');
+                document.getElementById('profile-preview-placeholder').classList.add('hidden');
+            }
+            
+            const isAlertActive = localStorage.getItem('reminders_active') === 'true';
+            document.getElementById('toggle-reminders').checked = isAlertActive;
+            handleReminderSetting(isAlertActive);
+        }
+
+        window.showConfirm = function(title, msg, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            modal.classList.remove('hidden');
+            
+            const btnYes = document.getElementById('confirm-yes');
+            const btnNo = document.getElementById('confirm-cancel');
+            
+            const close = () => modal.classList.add('hidden');
+            
+            btnYes.onclick = () => { onConfirm(); close(); };
+            btnNo.onclick = () => { close(); };
+        }
+
+        window.getStatus = function(debtor) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const due = new Date(debtor.dueDate);
+            const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            
+            if (debtor.status === "pago") return { text: "Liquidado", class: "status-pago" };
+            if (diffDays < 0) return { text: `Vencido (${Math.abs(diffDays)}d)`, class: "status-vencido" };
+            if (diffDays === 0) return { text: "Vence hoje", class: "status-vencido font-bold" };
+            return { text: `Em ${diffDays} dias`, class: "status-em-dia" };
+        }
+
+        window.calculateCurrentAmount = function(debtor) {
+            if (debtor.status === 'pago') return Number(debtor.amount);
+            const today = new Date();
+            const due = new Date(debtor.dueDate);
+            const diffDays = Math.ceil((today - due) / (1000 * 60 * 60 * 24));
+            if (diffDays <= 0) return Number(debtor.amount);
+            const interest = Number(debtor.interest || 0) / 100;
+            return Number(debtor.amount) + (Number(debtor.amount) * interest * diffDays);
+        }
+
+        window.renderDebtorsTable = function(filter = '') {
+            const tbody = document.getElementById('debtors-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            const filtered = window.debtors.filter(d => 
+                d.name.toLowerCase().includes(filter.toLowerCase()) || 
+                d.phone.includes(filter)
+            );
+
+            filtered.forEach(debtor => {
+                const status = getStatus(debtor);
+                const currentVal = calculateCurrentAmount(debtor);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="px-8 py-5">
+                    <div class="flex items-center gap-3">
+                        <img src="${debtor.photo || 'https://ui-avatars.com/api/?name='+debtor.name}" class="client-thumb border border-gray-100">
+                        <div>
+                           <p class="font-bold text-gray-700">${debtor.name}</p>
+                           <p class="text-[10px] text-gray-400 font-mono">${debtor.phone}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-5">
+                    <p class="font-bold text-red-600">R$ ${currentVal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                    <p class="text-[10px] text-gray-400">Orig: R$ ${Number(debtor.amount).toFixed(2)}</p>
+                </td>
+                <td class="px-6 py-5 text-gray-500">${new Date(debtor.dueDate).toLocaleDateString('pt-BR')}</td>
+                <td class="px-6 py-5">
+                    <div class="flex gap-2">
+                        ${debtor.docUrl ? `<a href="${debtor.docUrl}" target="_blank" class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-200" title="Ver Documento"><i class="fa-solid fa-id-card"></i></a>` : ''}
+                        ${debtor.bankUrl ? `<a href="${debtor.bankUrl}" target="_blank" class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-200" title="Ver Comprovante"><i class="fa-solid fa-receipt"></i></a>` : ''}
+                    </div>
+                </td>
+                <td class="px-6 py-5"><span class="${status.class} text-[10px] uppercase font-bold px-3 py-1 rounded-full">${status.text}</span></td>
+                <td class="px-8 py-5 text-right space-x-2">
+                    ${debtor.status !== 'pago' ? `<button onclick="confirmMarkPaid('${debtor.id}')" class="text-blue-500 hover:text-blue-700" title="Pagar"><i class="fa-solid fa-check-double"></i></button>` : ''}
+                    <button onclick="sendViaWhatsApp('${debtor.id}')" class="text-emerald-500 hover:text-emerald-700" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+                    <button onclick="editDebtor('${debtor.id}')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="confirmDelete('${debtor.id}')" class="text-red-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        window.confirmMarkPaid = (id) => showConfirm("Liquidando Dívida", "Deseja marcar este registro como PAGO?", async () => {
+            await DB.updateItem('debtors', id, { status: 'pago' });
+            await loadData();
+        });
+
+        window.confirmDelete = (id) => showConfirm("Remover Registro", "Deseja realmente apagar esta dívida do sistema?", async () => {
+            await DB.deleteItem('debtors', id);
+            await loadData();
+        });
+
+        window.sendViaWhatsApp = async function(id) {
+            const d = window.debtors.find(x => x.id === id);
+            const val = calculateCurrentAmount(d).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            const text = `Olá ${d.name}, informamos que o valor de R$ ${val} está registrada em nosso sistema. Por favor, regularize para evitar novos juros. COBRA+`;
+            const msg = encodeURIComponent(text);
+            const phone = d.phone.replace(/\D/g, '');
+            
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+            await logMessage(d.name, 'WhatsApp', text);
+        }
+
+        async function logMessage(name, type, text) {
+            await DB.addItem('messagesLog', { 
+                name, text: text, timestamp: new Date().toISOString(), type 
+            });
+            await loadData();
+        }
+
+        window.confirmClearMessages = () => showConfirm("Limpar Histórico", "Deseja realmente apagar todas as notificações?", async () => {
+            await DB.clearCollection('messagesLog');
+            await loadData();
+        });
+
+        window.updateDashboardCards = function() {
+            const total = window.debtors.filter(d => d.status !== 'pago').reduce((acc, d) => acc + calculateCurrentAmount(d), 0);
+            document.getElementById('total-debt').textContent = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('total-debtors').textContent = window.debtors.filter(d => d.status !== 'pago').length;
+            document.getElementById('messages-today').textContent = window.messagesLog.length;
+            const overdue = window.debtors.filter(d => d.status !== 'pago' && getStatus(d).class.includes('vencido')).length;
+            document.getElementById('overdue-count').textContent = overdue;
+            document.getElementById('notification-badge').textContent = window.messagesLog.length;
+        }
+
+        window.renderNextDue = function() {
+            const nextContainer = document.getElementById('next-due-list');
+            const vencidosContainer = document.getElementById('vencidos-list');
+            if(!nextContainer || !vencidosContainer) return;
+            
+            nextContainer.innerHTML = '';
+            vencidosContainer.innerHTML = '';
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const vencidos = window.debtors
+                .filter(d => d.status !== 'pago' && new Date(d.dueDate) < today)
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+            const proximos = window.debtors
+                .filter(d => d.status !== 'pago' && new Date(d.dueDate) >= today)
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            const renderCard = (debtor, target) => {
+                const div = document.createElement('div');
+                div.className = "bg-white border border-gray-100 rounded-3xl p-5 flex items-center justify-between card-hover shadow-sm";
+                div.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <img src="${debtor.photo || 'https://ui-avatars.com/api/?name='+debtor.name}" class="client-thumb">
+                    <div>
+                        <p class="font-bold text-gray-800 line-clamp-1">${debtor.name}</p>
+                        <p class="text-red-600 text-sm font-bold">R$ ${calculateCurrentAmount(debtor).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        <p class="text-[10px] text-gray-400">Vence: ${new Date(debtor.dueDate).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                <button onclick="sendViaWhatsApp('${debtor.id}')" class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </button>`;
+                target.appendChild(div);
+            }
+
+            vencidos.forEach(d => renderCard(d, vencidosContainer));
+            proximos.forEach(d => renderCard(d, nextContainer));
+            
+            if(vencidos.length === 0) vencidosContainer.innerHTML = '<p class="text-gray-400 text-sm italic">Nenhuma dívida vencida.</p>';
+            if(proximos.length === 0) nextContainer.innerHTML = '<p class="text-gray-400 text-sm italic">Sem vencimentos futuros.</p>';
+        }
+
+        window.renderMessages = function() {
+            const container = document.getElementById('messages-list');
+            const miniContainer = document.getElementById('notifications-modal-list');
+            if(!container) return;
+            
+            const html = window.messagesLog.length ? '' : `<div class="text-center py-10 text-gray-400">Nenhum disparo registrado.</div>`;
+            container.innerHTML = html;
+            if(miniContainer) miniContainer.innerHTML = html;
+
+            window.messagesLog.slice().reverse().forEach((msg, idx) => {
+                const itemHtml = `
+                <div class="bg-white border border-gray-100 rounded-2xl p-4 flex gap-4 items-center">
+                    <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                        <i class="fa-solid ${msg.type === 'WhatsApp' ? 'fa-brands fa-whatsapp text-emerald-500' : (msg.type === 'Sistema' ? 'fa-robot text-red-600' : 'fa-comment-sms text-blue-400')}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-gray-800">${msg.name} <span class="font-normal text-gray-400 ml-2">${new Date(msg.timestamp).toLocaleTimeString()}</span></p>
+                        <p class="text-[11px] text-gray-500 mt-1 line-clamp-1">${msg.text}</p>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+                if(miniContainer && idx < 5) miniContainer.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        window.runAutomaticMessages = async function() {
+            for (const d of window.debtors) {
+                if(d.status !== 'pago' && getStatus(d).class.includes('vencido')) {
+                    const val = calculateCurrentAmount(d).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    const msg = `SISTEMA: Alerta automático de vencimento para ${d.name}. Valor: R$ ${val}.`;
+                    await logMessage(d.name, 'Sistema', msg);
+                }
+            }
+            document.getElementById('last-auto-check').textContent = new Date().toLocaleTimeString();
+        }
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        window.showNotificationsModal = () => document.getElementById('notifications-modal').classList.remove('hidden');
+        window.hideNotificationsModal = () => document.getElementById('notifications-modal').classList.add('hidden');
+        window.showProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
+        window.hideProfileModal = () => document.getElementById('profile-modal').classList.add('hidden');
+        window.showRecoverModal = () => document.getElementById('recover-modal').classList.remove('hidden');
+        window.hideRecoverModal = () => document.getElementById('recover-modal').classList.add('hidden');
+
+        window.processRecovery = () => {
+            const user = document.getElementById('recover-username').value;
+            const cred = credenciais.find(c => c.usuario === user);
+            if(cred) {
+                const msg = encodeURIComponent(`Recuperação COBRA+: Sua senha é ${cred.senha}`);
+                window.open(`https://wa.me/${cred.telefone}?text=${msg}`, '_blank');
+                alert("As instruções foram enviadas para o WhatsApp vinculado ao usuário.");
+                hideRecoverModal();
+            } else {
+                alert("Usuário não localizado.");
+            }
+        };
+
+        window.handleReminderSetting = (active) => {
+            clearInterval(reminderInterval);
+            if(active) {
+                reminderInterval = setInterval(() => {
+                    runAutomaticMessages();
+                }, 300000); 
+            }
+        };
+
+        window.navigate = function(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            const target = document.getElementById(`screen-${screen}`);
+            if(target) target.classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(a => a.classList.remove('active-link'));
+            const active = document.getElementById(`nav-${screen}`);
+            if(active) active.classList.add('active-link');
+        }
+
+        window.showAddDebtorModal = function() {
+            document.getElementById('debtor-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('modal-photo').value = '';
+            document.getElementById('modal-doc').value = '';
+            document.getElementById('modal-bank').value = '';
+            document.getElementById('modal-title').textContent = "Nova Dívida";
+            document.getElementById('debtor-modal').classList.remove('hidden');
+        }
+        
+        window.hideDebtorModal = function() { document.getElementById('debtor-modal').classList.add('hidden'); }
+        
+        window.editDebtor = function(id) {
+            const d = window.debtors.find(x => x.id === id);
+            document.getElementById('edit-id').value = d.id;
+            document.getElementById('modal-name').value = d.name;
+            document.getElementById('modal-amount').value = d.amount;
+            document.getElementById('modal-due-date').value = d.dueDate;
+            document.getElementById('modal-interest').value = d.interest || 3;
+            document.getElementById('modal-phone').value = d.phone;
+            document.getElementById('modal-photo').value = d.photo || '';
+            document.getElementById('modal-doc').value = d.docUrl || '';
+            document.getElementById('modal-bank').value = d.bankUrl || '';
+            document.getElementById('modal-title').textContent = "Editar Dívida";
+            document.getElementById('debtor-modal').classList.remove('hidden');
+        }
+
+        window.logout = function() {
+            localStorage.removeItem('cobrama_logged');
+            localStorage.removeItem('cobrama_user');
+            location.reload();
+        }
+
+        window.onload = async () => {
+            if (localStorage.getItem('cobrama_logged') === 'true') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                renderSidebar();
+                await loadData();
+            }
+            
+            document.getElementById('login-form').onsubmit = (e) => {
+                e.preventDefault();
+                const userVal = document.getElementById('username').value;
+                const passVal = document.getElementById('password').value;
+                
+                // Validação através das credenciais importadas do arquivo rec_senha.js
+                const matched = credenciais.find(c => c.usuario === userVal && c.senha === passVal);
+                
+                if(matched) {
+                    localStorage.setItem('cobrama_logged', 'true');
+                    localStorage.setItem('cobrama_user', matched.usuario);
+                    location.reload();
+                } else {
+                    alert("Usuário ou senha inválidos.");
+                }
+            };
+
+            document.getElementById('recover-password-link').onclick = (e) => {
+                e.preventDefault();
+                showRecoverModal();
+            };
+
+            document.getElementById('search-debtors').oninput = (e) => {
+                renderDebtorsTable(e.target.value);
+            };
+
+            document.getElementById('profile-photo-file').onchange = async (e) => {
+                if(e.target.files[0]) {
+                    const b64 = await toBase64(e.target.files[0]);
+                    localStorage.setItem('profile_photo', b64);
+                    updateUIPrivate();
+                }
+            };
+
+            document.getElementById('modal-photo-file').onchange = async (e) => {
+                if(e.target.files[0]) document.getElementById('modal-photo').value = await toBase64(e.target.files[0]);
+            };
+            document.getElementById('modal-doc-file').onchange = async (e) => {
+                if(e.target.files[0]) document.getElementById('modal-doc').value = await toBase64(e.target.files[0]);
+            };
+            document.getElementById('modal-bank-file').onchange = async (e) => {
+                if(e.target.files[0]) document.getElementById('modal-bank').value = await toBase64(e.target.files[0]);
+            };
+
+            document.getElementById('toggle-reminders').onchange = (e) => {
+                localStorage.setItem('reminders_active', e.target.checked);
+                handleReminderSetting(e.target.checked);
+            };
+
+            document.getElementById('debtor-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('edit-id').value;
+                const data = {
+                    name: document.getElementById('modal-name').value,
+                    amount: document.getElementById('modal-amount').value,
+                    dueDate: document.getElementById('modal-due-date').value,
+                    interest: document.getElementById('modal-interest').value,
+                    phone: document.getElementById('modal-phone').value,
+                    photo: document.getElementById('modal-photo').value,
+                    docUrl: document.getElementById('modal-doc').value,
+                    bankUrl: document.getElementById('modal-bank').value,
+                    status: 'pendente'
+                };
+                if(id) {
+                   const old = window.debtors.find(x => x.id === id);
+                   data.status = old.status;
+                   await DB.updateItem('debtors', id, data);
+                }
+                else await DB.addItem('debtors', data);
+                hideDebtorModal();
+                await loadData();
+            };
+        };
+
+        function renderSidebar() {
+            const menu = `
+            <a onclick="navigate('dashboard')" class="sidebar-link flex items-center gap-3 px-6 py-4 rounded-2xl active-link cursor-pointer" id="nav-dashboard">
+                <i class="fa-solid fa-house"></i> Início
+            </a>
+            <a onclick="navigate('debtors')" class="sidebar-link flex items-center gap-3 px-6 py-4 rounded-2xl cursor-pointer" id="nav-debtors">
+                <i class="fa-solid fa-address-book"></i> Devedores
+            </a>
+            <a onclick="navigate('messages')" class="sidebar-link flex items-center gap-3 px-6 py-4 rounded-2xl cursor-pointer" id="nav-messages">
+                <i class="fa-solid fa-clock-rotate-left"></i> Histórico
+            </a>`;
+            document.getElementById('sidebar-nav').innerHTML = menu;
+        }
+
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('.lg\\:flex');
+            sidebar.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -221,6 +221,11 @@ async function getUserProfile(user) {
     return await readFromFirebase(`profiles/${user}`);
 }
 
+// NOVO: Função para buscar devedor único (para link de cobrança)
+async function getDebtor(id) {
+    return await readFromFirebase(`debtors/${id}`);
+}
+
 const DB = {
   initFirebase,
   getAll,
@@ -239,7 +244,8 @@ const DB = {
   gerarQRCode,
   clearCollection,
   saveUserProfile,
-  getUserProfile
+  getUserProfile,
+  getDebtor
 };
 
 window.DB = DB;

@@ -138,6 +138,50 @@
     </style>
 </head>
 <body class="tailwind-ready">
+    <!-- TELA DE VISUALIZAÇÃO PÚBLICA (COBRANÇA) -->
+    <div id="public-view-screen" class="hidden min-h-screen bg-gray-50 flex flex-col items-center p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden mt-10">
+            <div class="bg-red-600 p-8 text-center text-white">
+                <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-file-invoice-dollar text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Detalhamento de Cobrança</h2>
+                <p class="text-red-100 text-sm mt-1">COBRA- Sistema de Gestão</p>
+            </div>
+            <div class="p-8 space-y-6">
+                <div class="text-center">
+                    <p class="text-gray-400 text-xs uppercase font-bold tracking-widest">Devedor</p>
+                    <h3 id="public-name" class="text-2xl font-bold text-gray-900 mt-1">Carregando...</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-2xl text-center">
+                        <p class="text-gray-400 text-[10px] uppercase font-bold">Vencimento</p>
+                        <p id="public-due" class="font-bold text-gray-800">--/--/--</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl text-center">
+                        <p class="text-gray-400 text-[10px] uppercase font-bold">Status</p>
+                        <p id="public-status" class="font-bold">Aguardando</p>
+                    </div>
+                </div>
+                <div class="border-t border-dashed border-gray-200 pt-6 text-center">
+                    <p class="text-gray-400 text-sm mb-1">Valor Total Atualizado</p>
+                    <p id="public-total" class="text-4xl font-black text-red-600">R$ 0,00</p>
+                    <p id="public-details" class="text-[10px] text-gray-400 mt-2 uppercase"></p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-2xl flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-blue-500 mt-1"></i>
+                    <p class="text-xs text-blue-700 leading-relaxed">
+                        Este valor inclui juros diários conforme acordado. Para regularização, entre em contato com seu agente de cobrança.
+                    </p>
+                </div>
+                <button onclick="window.location.reload()" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> ATUALIZAR VALORES
+                </button>
+            </div>
+        </div>
+        <p class="text-gray-400 text-[10px] mt-8 uppercase font-medium">Link de Acesso Único</p>
+    </div>
+
     <!-- TELA DE LOGIN -->
     <div id="login-screen" class="min-h-screen bg-gradient-to-br from-red-800 to-red-950 flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
@@ -357,6 +401,65 @@
         </div>
     </div>
 
+    <!-- MODAL DETALHES DO CLIENTE (DADOS + LOCALIZAÇÃO) -->
+    <div id="client-details-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[99999] p-4 overflow-y-auto">
+        <div class="modal bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl my-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 id="detail-name" class="text-2xl font-bold">Nome do Cliente</h3>
+                    <p id="detail-phone" class="text-gray-400 font-mono text-sm"></p>
+                </div>
+                <button onclick="document.getElementById('client-details-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="space-y-6">
+                    <div class="bg-gray-50 p-4 rounded-2xl">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Resumo Financeiro</p>
+                        <div class="space-y-1">
+                            <p class="flex justify-between"><span>Original:</span> <b id="detail-amount">R$ 0,00</b></p>
+                            <p class="flex justify-between text-red-600"><span>Atualizado:</span> <b id="detail-current">R$ 0,00</b></p>
+                            <p class="flex justify-between"><span>Vencimento:</span> <b id="detail-due">00/00/0000</b></p>
+                            <p class="flex justify-between"><span>Juros:</span> <b id="detail-interest">0% / dia</b></p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 p-4 rounded-2xl">
+                        <p class="text-[10px] font-bold text-red-400 uppercase mb-3">Localização de Acesso</p>
+                        <div id="detail-location-box" class="flex flex-col items-center gap-3">
+                            <p id="detail-last-seen" class="text-xs text-red-800 text-center">Nenhum acesso registrado ainda.</p>
+                            <button id="detail-map-btn" class="hidden w-full py-3 bg-red-600 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-location-dot"></i> ABRIR NO MAPA
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Arquivos e Fotos</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="aspect-square bg-gray-100 rounded-2xl overflow-hidden cursor-pointer border border-gray-200" onclick="expandImage('detail-img-profile')">
+                            <img id="detail-img-profile" src="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="aspect-square bg-gray-100 rounded-2xl overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center" onclick="expandImage('detail-img-doc')">
+                             <img id="detail-img-doc" src="" class="w-full h-full object-cover hidden">
+                             <span id="detail-no-doc" class="text-xs text-gray-400 text-center p-2">Sem Documento</span>
+                        </div>
+                        <div class="aspect-square bg-gray-100 rounded-2xl overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center" onclick="expandImage('detail-img-bank')">
+                             <img id="detail-img-bank" src="" class="w-full h-full object-cover hidden">
+                             <span id="detail-no-bank" class="text-xs text-gray-400 text-center p-2">Sem Comprovante</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="copyViewLink(window.currentDetailId)" class="flex-1 py-4 bg-gray-900 text-white rounded-2xl font-bold text-sm uppercase">Copiar Link Público</button>
+                <button onclick="sendViaWhatsApp(window.currentDetailId)" class="flex-1 py-4 bg-emerald-600 text-white rounded-2xl font-bold text-sm uppercase">Cobrar WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DEVEDOR -->
     <div id="debtor-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[99999] p-4 overflow-y-auto">
         <div class="modal bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl my-8">
@@ -467,7 +570,7 @@
                 <i class="fa-solid fa-check-circle"></i>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-1">Copiado!</h3>
-            <p class="text-gray-500 text-xs mb-6">O resumo da dívida foi enviado para sua área de transferência.</p>
+            <p id="copy-success-msg" class="text-gray-500 text-xs mb-6">O resumo da dívida foi enviado para sua área de transferência.</p>
             <button onclick="document.getElementById('copy-success-modal').classList.add('hidden')" class="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold">OK</button>
         </div>
     </div>
@@ -641,8 +744,70 @@
             const text = `COBRANÇA: ${d.name}\nValor Atual: ${val}\nVencimento Original: ${new Date(d.dueDate).toLocaleDateString()}\nStatus: ${getStatus(d).text}`;
             
             navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('copy-success-msg').textContent = "O resumo da dívida foi enviado para sua área de transferência.";
                 document.getElementById('copy-success-modal').classList.remove('hidden');
             });
+        }
+
+        // NOVO: Função para copiar link de visualização detalhada
+        window.copyViewLink = function(id) {
+            const url = window.location.origin + window.location.pathname + '?id=' + id;
+            navigator.clipboard.writeText(url).then(() => {
+                document.getElementById('copy-success-msg').textContent = "Link de visualização detalhada copiado com sucesso!";
+                document.getElementById('copy-success-modal').classList.remove('hidden');
+            });
+        }
+
+        // NOVO: Função para ver localização no mapa
+        window.viewLocation = function(lat, lng) {
+            if(!lat || !lng) return alert("Localização ainda não capturada para este cliente.");
+            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+        }
+
+        // NOVO: Função para mostrar todos os dados e localização ao clicar no cliente
+        window.showClientDetails = function(id) {
+            const d = window.debtors.find(x => x.id === id);
+            if(!d) return;
+            window.currentDetailId = id;
+            
+            document.getElementById('detail-name').textContent = d.name;
+            document.getElementById('detail-phone').textContent = d.phone;
+            document.getElementById('detail-amount').textContent = Number(d.amount).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            document.getElementById('detail-current').textContent = calculateCurrentAmount(d).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            document.getElementById('detail-due').textContent = new Date(d.dueDate).toLocaleDateString();
+            document.getElementById('detail-interest').textContent = `${d.interest}% / dia`;
+            
+            // Fotos
+            document.getElementById('detail-img-profile').src = d.photo || 'https://ui-avatars.com/api/?name='+d.name;
+            
+            const docImg = document.getElementById('detail-img-doc');
+            const noDoc = document.getElementById('detail-no-doc');
+            if(d.docUrl) { docImg.src = d.docUrl; docImg.classList.remove('hidden'); noDoc.classList.add('hidden'); }
+            else { docImg.classList.add('hidden'); noDoc.classList.remove('hidden'); }
+
+            const bankImg = document.getElementById('detail-img-bank');
+            const noBank = document.getElementById('detail-no-bank');
+            if(d.bankUrl) { bankImg.src = d.bankUrl; bankImg.classList.remove('hidden'); noBank.classList.add('hidden'); }
+            else { bankImg.classList.add('hidden'); noBank.classList.remove('hidden'); }
+
+            // Localização
+            const lastSeenText = document.getElementById('detail-last-seen');
+            const mapBtn = document.getElementById('detail-map-btn');
+            if(d.lastLat && d.lastLng) {
+                lastSeenText.textContent = `Visto em: ${new Date(d.lastSeen).toLocaleString()}`;
+                mapBtn.classList.remove('hidden');
+                mapBtn.onclick = () => viewLocation(d.lastLat, d.lastLng);
+            } else {
+                lastSeenText.textContent = "Nenhum acesso registrado ainda.";
+                mapBtn.classList.add('hidden');
+            }
+
+            document.getElementById('client-details-modal').classList.remove('hidden');
+        }
+
+        window.expandImage = function(id) {
+            const src = document.getElementById(id).src;
+            if(src) viewAttachment(src, "Visualização de Arquivo");
         }
 
         window.renderDebtorsTable = function(filter = '') {
@@ -660,7 +825,7 @@
                 const currentVal = calculateCurrentAmount(debtor);
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                <td class="px-8 py-5" data-label="Cliente">
+                <td class="px-8 py-5 cursor-pointer hover:bg-gray-50 transition-all" data-label="Cliente" onclick="showClientDetails('${debtor.id}')">
                     <div class="flex items-center gap-3">
                         <img src="${debtor.photo || 'https://ui-avatars.com/api/?name='+debtor.name}" class="client-thumb border border-gray-100">
                         <div>
@@ -680,12 +845,14 @@
                     <div class="flex gap-2">
                         ${debtor.docUrl ? `<button onclick="viewAttachment('${debtor.docUrl}', '${debtor.name} - Identidade')" class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-200" title="Ver Documento"><i class="fa-solid fa-id-card"></i></button>` : ''}
                         ${debtor.bankUrl ? `<button onclick="viewAttachment('${debtor.bankUrl}', '${debtor.name} - Comprovante')" class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-200" title="Ver Comprovante"><i class="fa-solid fa-receipt"></i></button>` : ''}
+                        ${debtor.lastLat ? `<button onclick="viewLocation(${debtor.lastLat}, ${debtor.lastLng})" class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 hover:bg-blue-200" title="Ver Localização"><i class="fa-solid fa-location-dot"></i></button>` : ''}
                     </div>
                 </td>
                 <td class="px-6 py-5" data-label="Situação"><span class="${status.class} text-[10px] uppercase font-bold px-3 py-1 rounded-full">${status.text}</span></td>
                 <td class="px-8 py-5 text-right space-x-2">
                     <div class="flex justify-end gap-2">
                         ${debtor.status !== 'pago' ? `<button onclick="confirmMarkPaid('${debtor.id}')" class="text-blue-500 hover:text-blue-700" title="Pagar"><i class="fa-solid fa-check-double"></i></button>` : ''}
+                        <button onclick="copyViewLink('${debtor.id}')" class="text-orange-400 hover:text-orange-600" title="Link de Acesso"><i class="fa-solid fa-link"></i></button>
                         <button onclick="copyDebtSummary('${debtor.id}')" class="text-gray-400 hover:text-gray-600" title="Copiar Resumo"><i class="fa-solid fa-copy"></i></button>
                         <button onclick="callClient('${debtor.phone}')" class="text-blue-400 hover:text-blue-600" title="Ligar"><i class="fa-solid fa-phone"></i></button>
                         <button onclick="sendViaWhatsApp('${debtor.id}')" class="text-emerald-500 hover:text-emerald-700" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
@@ -710,7 +877,8 @@
         window.sendViaWhatsApp = async function(id) {
             const d = window.debtors.find(x => x.id === id);
             const val = calculateCurrentAmount(d).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            const text = `Olá ${d.name}, informamos que o valor de R$ ${val} está registrada em nosso sistema. Por favor, regularize para evitar novos juros. COBRA-`;
+            const url = window.location.origin + window.location.pathname + '?id=' + id;
+            const text = `Olá ${d.name}, informamos que o valor de R$ ${val} está registrada em nosso sistema. Detalhes aqui: ${url} . Por favor, regularize para evitar novos juros. COBRA-`;
             const msg = encodeURIComponent(text);
             const phone = d.phone.replace(/\D/g, '');
             
@@ -761,7 +929,10 @@
             
             const renderCard = (debtor, target) => {
                 const div = document.createElement('div');
-                div.className = "bg-white border border-gray-100 rounded-3xl p-5 flex items-center justify-between card-hover shadow-sm";
+                div.className = "bg-white border border-gray-100 rounded-3xl p-5 flex items-center justify-between card-hover shadow-sm cursor-pointer";
+                div.onclick = (e) => {
+                    if(e.target.tagName !== 'I' && e.target.tagName !== 'BUTTON') showClientDetails(debtor.id);
+                };
                 div.innerHTML = `
                 <div class="flex items-center gap-4">
                     <img src="${debtor.photo || 'https://ui-avatars.com/api/?name='+debtor.name}" class="client-thumb">
@@ -772,10 +943,10 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="callClient('${debtor.phone}')" class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                    <button onclick="event.stopPropagation(); callClient('${debtor.phone}')" class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                         <i class="fa-solid fa-phone"></i>
                     </button>
-                    <button onclick="sendViaWhatsApp('${debtor.id}')" class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                    <button onclick="event.stopPropagation(); sendViaWhatsApp('${debtor.id}')" class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
                         <i class="fa-brands fa-whatsapp"></i>
                     </button>
                 </div>`;
@@ -919,6 +1090,47 @@
         }
 
         window.onload = async () => {
+            // Lógica de Detalhamento Público (Captura de Localização)
+            const params = new URLSearchParams(window.location.search);
+            const debtorId = params.get('id');
+            
+            if(debtorId) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('public-view-screen').classList.remove('hidden');
+                
+                const debtorData = await DB.getDebtor(debtorId);
+                if(debtorData) {
+                    const status = getStatus(debtorData);
+                    const val = calculateCurrentAmount(debtorData);
+                    document.getElementById('public-name').textContent = debtorData.name;
+                    document.getElementById('public-due').textContent = new Date(debtorData.dueDate).toLocaleDateString();
+                    document.getElementById('public-status').textContent = status.text;
+                    document.getElementById('public-total').textContent = val.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+                    document.getElementById('public-details').textContent = `Juros: ${debtorData.interest}%/dia • Valor Original: R$ ${Number(debtorData.amount).toFixed(2)}`;
+                    
+                    // Rastreamento - ATIVAÇÃO SEMPRE (Ao carregar link público)
+                    const saveLoc = async (pos) => {
+                        await DB.updateItem('debtors', debtorId, {
+                            lastLat: pos.coords.latitude,
+                            lastLng: pos.coords.longitude,
+                            lastSeen: new Date().toISOString()
+                        });
+                    };
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(saveLoc, (err) => {
+                            console.warn('GPS negado ou indisponível');
+                        }, { enableHighAccuracy: true });
+                        
+                        // Monitoramento contínuo enquanto a página está aberta
+                        navigator.geolocation.watchPosition(saveLoc, null, { enableHighAccuracy: true });
+                    }
+                } else {
+                    document.getElementById('public-name').textContent = "REGISTRO NÃO ENCONTRADO";
+                }
+                return; // Encerra aqui se for visualização pública
+            }
+
             if (localStorage.getItem('cobrama_logged') === 'true') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
